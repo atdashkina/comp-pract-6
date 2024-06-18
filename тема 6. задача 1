@@ -1,0 +1,49 @@
+#include <iostream>
+#include <cmath>
+#include <vector>
+
+using namespace std;
+
+// Функция, которую нужно минимизировать
+double f(const vector<double>& x) {
+    return exp(x[0] * x[0] + x[1] * x[1]) + log(4 + x[1] * x[1] + 2 * x[2] * x[2]);
+}
+
+// Метод покоординатного спуска
+vector<double> coordinate_descent(vector<double> x0, double alpha, int max_iter) {
+    int n = x0.size();
+    vector<double> x = x0;
+    
+    for (int iter = 0; iter < max_iter; ++iter) {
+        for (int i = 0; i < n; ++i) {
+            // Делать шаг вдоль i-й координаты
+            vector<double> x_new = x;
+            x_new[i] = x[i] - alpha * (exp(x[0] * x[0] + x[1] * x[1]) * 2 * x[i]);
+            
+            if (i == 1) {
+                x_new[i] -= alpha * (1 / (4 + x[1] * x[1] + 2 * x[2] * x[2]) * 2 * x[i]);
+            } else if (i == 2) {
+                x_new[i] -= alpha * (1 / (4 + x[1] * x[1] + 2 * x[2] * x[2]) * 4 * x[i]);
+            }
+            
+            if (f(x_new) < f(x)) {
+                x = x_new;
+            }
+        }
+    }
+    
+    return x;
+}
+
+int main() {
+    vector<double> x0 = {1.0, 1.0, 1.0};
+    double alpha = 0.01;
+    int max_iter = 1000;
+    
+    vector<double> x_min = coordinate_descent(x0, alpha, max_iter);
+    
+    cout << "Минимум достигается в точке: (" << x_min[0] << ", " << x_min[1] << ", " << x_min[2] << ")" << endl;
+    cout << "Значение функции в минимуме: " << f(x_min) << endl;
+    
+    return 0;
+}
